@@ -13,14 +13,12 @@ namespace TodoMvcApp.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // User tablosu konfigürasyonu
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasIndex(e => e.Username).IsUnique();
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
             });
 
-            // Todo tablosu konfigürasyonu
             modelBuilder.Entity<Todo>(entity =>
             {
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("CURRENT_TIMESTAMP");
