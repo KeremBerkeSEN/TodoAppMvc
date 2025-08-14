@@ -20,7 +20,7 @@ namespace TodoMvcApp.Models
         
         public DateTime CreatedDate { get; set; } = DateTime.Now;
         
-        // Bir kullanıcının birden çok todosu olabilir
+
         public virtual ICollection<Todo>? Todos { get; set; }
     }
 }

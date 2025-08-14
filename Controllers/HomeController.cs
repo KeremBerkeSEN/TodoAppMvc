@@ -1,27 +1,30 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
-using TodoMvcApp.Models;
+using System.Diagnostics; //"using" kalıbı bir keyword'tür aşağıda kullanacağımız bazı kelimelerin hangi kütüphanelerden geleceğini belirtirmek 
+using Microsoft.AspNetCore.Mvc; // için kütüphane adının başına ekleriz "." ise bir operatördür burada system kütüphanesinin diagnostics ksımında olduğunu belirtir.
+using TodoMvcApp.Models;// ";" satırı sonlandırır ve compiler'a yazdığımız deyimin bittiğini ifade ederiz 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 
-namespace TodoMvcApp.Controllers
+namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespace burada ifade edilecek tanımların başka yerlerdeki tanımlarla
+//karıştırılmaması ve buraya özgü olduğunu belirtmek için kullanılır. 
 {
-    public class HomeController : Controller
+    public class HomeController : Controller// public,private ve protected gibi keyword'ler önüne yazıldığı sınıf vb. seylerin erişilebilme türlerini ifade eder
+    //class ise bir nesneyi düzenlemek ve özel bir şekilde inşaa etmek için parçalarına (class'larına) bölüp bu parçalardan tekrar bir bütün elde etmemizi sağlar
+    //HomeController : Controller ise bu sınıfın diğer sınıflarlarla karışmaması için sadece HomeController'daki Controller sınıfının olduğunu belirtir
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly AppDbContext _context;
-
+        private readonly ILogger<HomeController> _logger;//burada readonly keyword'ü burada tanımlanan _logger ve _context değişkenlerinin
+        private readonly AppDbContext _context;//aşağıda  _logger= logger şeklinde tanımlanmasına rağmen _logger değişkenine başka bir değer atanamaz
+        //ILogger arayüzü HomeController sınıfı için bir kayıt tutucu görevi görür
         public HomeController(ILogger<HomeController> logger, AppDbContext context)
         {
-            _logger = logger;
-            _context = context;
+            _logger = logger;//"=" operatörü burada logger değerini _logger değişkenine atama görevi görür
+            _context = context;//"=" operatörü ile context değerini _context değişkenine atama
         }
 
-        [Authorize]
-        public IActionResult Index()
-        {
+        [Authorize]//kimlik doğrulama işlemi yapıldıktan sonra yetkilendirmek için kullanılır
+        public IActionResult Index()//burada IActionResult bir arayüzdür ve bu arayüzü uygulayan sınıflar, HTTP isteklerine karşılık gelen sonuçları temsil eder
+        {//Index() bir metottur.
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
             var todos = _context.Todos.Where(t => t.UserId == userId).ToList();
             return View(todos);
@@ -29,13 +32,13 @@ namespace TodoMvcApp.Controllers
 
         public IActionResult Privacy()
         {
-            return View();
+            return View();//
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public IActionResult Login()//
         {
-            return View();
+            return View();//
         }
 
         [HttpPost]
@@ -74,7 +77,7 @@ namespace TodoMvcApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult AddTodo([FromBody] Todo todo)
+        public IActionResult AddTodo([FromBody] Todo todo) 
         {
             try
             {
@@ -82,7 +85,7 @@ namespace TodoMvcApp.Controllers
                 {
                     var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
                     
-                    var newTodo = new Todo
+                    var newTodo = new Todo 
                     {
                         Title = todo.Title,
                         Description = todo.Description,
@@ -100,7 +103,7 @@ namespace TodoMvcApp.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Görev eklenirken hata oluştu");
+                _logger.LogError(ex, "Görev eklenirken hata oluştu"); 
                 return Json(new { success = false, message = "Bir hata oluştu" });
             }
         }
@@ -123,7 +126,7 @@ namespace TodoMvcApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult DeleteTodo([FromBody] int id)
+        public IActionResult DeleteTodo([FromBody] int id) 
         {
             try
             {
@@ -147,7 +150,7 @@ namespace TodoMvcApp.Controllers
 
         [HttpPost]
         [Authorize]
-        public IActionResult CompleteTodo([FromBody] int id)
+        public IActionResult CompleteTodo([FromBody] int id) 
         {
             try
             {
