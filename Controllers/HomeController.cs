@@ -11,45 +11,47 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
 {
     public class HomeController : Controller// public,private ve protected gibi keyword'ler önüne yazıldığı sınıf vb. seylerin erişilebilme türlerini ifade eder
     //class ise bir nesneyi düzenlemek ve özel bir şekilde inşaa etmek için parçalarına (class'larına) bölüp bu parçalardan tekrar bir bütün elde etmemizi sağlar
-    //HomeController : Controller ise bu sınıfın diğer sınıflarlarla karışmaması için sadece HomeController'daki Controller sınıfının olduğunu belirtir
+    //HomeController : Controller ise bu sınıfın diğer sını flarlarla karışmaması için sadece HomeController'daki Controller sınıfının olduğunu belirtir
     {
-        private readonly ILogger<HomeController> _logger;//burada readonly keyword'ü burada tanımlanan _logger ve _context değişkenlerinin
-        private readonly AppDbContext _context;//aşağıda  _logger= logger şeklinde tanımlanmasına rağmen _logger değişkenine başka bir değer atanamaz
-        //ILogger arayüzü HomeController sınıfı için bir kayıt tutucu görevi görür
-        public HomeController(ILogger<HomeController> logger, AppDbContext context)
+        private readonly ILogger<HomeController> _logger;//Burada <> operatörleri, bir sınıfın belirli bir türle çalışmasını sağlar. 
+        private readonly AppDbContext _context;//readonly keyword'ü bir alanın (field) yalnızca tanımlandığı sırada veya constructor içinde atanabileceğini belirtir
+        public HomeController(ILogger<HomeController> logger, AppDbContext context)//Burada <> operatörleri, bir sınıfın belirli bir türle çalışmasını sağlar. 
         {
-            _logger = logger;//"=" operatörü burada logger değerini _logger değişkenine atama görevi görür
-            _context = context;//"=" operatörü ile context değerini _context değişkenine atama
+            _logger = logger;//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+            _context = context;//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
         }
 
-        [Authorize]//kimlik doğrulama işlemi yapıldıktan sonra yetkilendirmek için kullanılır
+        [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         public IActionResult Index()//burada IActionResult bir arayüzdür ve bu arayüzü uygulayan sınıflar, HTTP isteklerine karşılık gelen sonuçları temsil eder
-        {//Index() bir metottur.
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+        {//Index() bir metottur.() operatörü, bir metodu çağırmak için kullanılır.
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//Burada "var" keyword'ü değişkeni bildirmek ve derleyicinin değişkenin türünü otomatik belirlemesi için kullanılır.
+            //userId değişkeni, User nesnesi içerisinden FindFirst fonksiyonu ile ClaimTypes.NameIdentifier değerini bulur ve bu değeri int türüne dönüştürür. Eğer bu değer null ise, "0" olarak varsayılır.
             var todos = _context.Todos.Where(t => t.UserId == userId).ToList();
-            return View(todos);
+            return View(todos);//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.View() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.  
+        }//Parantezler arasında yazılanlar metot için gerekli parametrelerin iletilmesini sağlar.
+
+        public IActionResult Privacy()//Burada Public bir erişim belirtecidir, IActionResult ASP.NET Core'da bir Arayüz ismidir,Privacy() ise bir methottur
+        {
+            return View();//View() bir methottur return ise bu  View() metodu çağrılmasını ve değer döndürmesini sağlayan bir keyword'dür
         }
 
-        public IActionResult Privacy()
+        [HttpGet]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        public IActionResult Login()//Burada Public bir erişim belirtecidir, IActionResult ASP.NET Core'da bir Arayüz ismidir,Login() ise bir methottur
         {
-            return View();//
+            return View();//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.View() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.
         }
 
-        [HttpGet]
-        public IActionResult Login()//
+        [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        public async Task<IActionResult> Login(string username, string password)//async bu metotun asenkron çalışacağını belirtir.Asenkron işlemler, uygulamanın diğer işlemleri engellemeden uzun süren işlemleri gerçekleştirmesine olanak tanır.
+        //Login bit methot adıdır bu methodun aldığı parametrelerde string keyword'ü metin değeri tutan bir veri türüdür 
         {
-            return View();//
-        }
+            var user = _context.Users.FirstOrDefault(u => u.Username == username && u.Password == password);//user değişkenin adıdır.
+            //FirstOrDefault bğir methottur."u =>" Lambda ifadesidir ve LINQ sorgularında kullanılır."==" Eşitlik operatörüdür."&&" Mantıksal VE operatörüdür.
+            if (user != null)//if bir koşul ifadesidir,() içerisinde koşullar belirtilir, belirtilen koşul doğruysa {} içinde tanımlanan kod bloğu çalıştırılır.
+            {//burada "!=" bir karşılaştırma operatörüdür. İki değerin eşit olmadığını kontrol eder. "null" bir değerdir ve bir değişkenin herhangi bir nesneye işaret etmediğini belirtir. Burada user değişkeninin değeri null değilse {} içindeki kod satırları çalıştıralacaktır
+                var claims = new List<Claim>//claims: Değişkenin adıdır. "new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür.
+                {//Bu durumda, claims değişkeninin türü List<Claim> olacaktır. Derleyici, sağ taraftaki ifadeye bakarak türü otomatik olarak belirler.
 
-        [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
-        {
-            var user = _context.Users.FirstOrDefault(u => u.Username == username && u.Password == password);
-            
-            if (user != null)
-            {
-                var claims = new List<Claim>
-                {
                     new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
                 };
@@ -66,7 +68,7 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             }
 
             ViewBag.Error = "Kullanıcı adı veya şifre hatalı";
-            return View();
+            return View();//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.View() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.
         }
 
         public async Task<IActionResult> Logout()
@@ -75,8 +77,8 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             return RedirectToAction("Login");
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         public IActionResult AddTodo([FromBody] Todo todo) 
         {
             try
@@ -108,8 +110,8 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             }
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         public IActionResult ToggleTodo(int id)
         {
             var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
@@ -124,8 +126,8 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             return Json(new { success = false, message = "Görev bulunamadı" });
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         public IActionResult DeleteTodo([FromBody] int id) 
         {
             try
@@ -148,8 +150,8 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             }
         }
 
-        [HttpPost]
-        [Authorize]
+        [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
+        [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         public IActionResult CompleteTodo([FromBody] int id) 
         {
             try
