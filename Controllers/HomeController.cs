@@ -1,5 +1,6 @@
 using System.Diagnostics; //"using" kalıbı bir keyword'tür aşağıda kullanacağımız bazı kelimelerin hangi kütüphanelerden geleceğini belirtirmek 
-using Microsoft.AspNetCore.Mvc; // için kütüphane adının başına ekleriz "." ise bir operatördür burada system kütüphanesinin diagnostics ksımında olduğunu belirtir.
+using Microsoft.AspNetCore.Mvc; // için kütüphane adının başına ekleriz "." ise bir operatördür ve amacı bir nesnenin özelliklerine, metodlarına veya alt üyelerine erişmek için kullanılır.
+//"." operatörü yukarıda system kütüphanesinin diagnostics kısmında olduğunu belirtir.
 using TodoMvcApp.Models;// ";" satırı sonlandırır ve compiler'a yazdığımız deyimin bittiğini ifade ederiz 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -16,7 +17,7 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
         private readonly ILogger<HomeController> _logger;//Burada <> operatörleri, bir sınıfın belirli bir türle çalışmasını sağlar. 
         private readonly AppDbContext _context;//readonly keyword'ü bir alanın (field) yalnızca tanımlandığı sırada veya constructor içinde atanabileceğini belirtir
         public HomeController(ILogger<HomeController> logger, AppDbContext context)//Burada <> operatörleri, bir sınıfın belirli bir türle çalışmasını sağlar. 
-        {
+        {//"," bir operatördür ve Yukarıda "," birden fazla parametreyi/metodu ayırmak için kullanılmıştır
             _logger = logger;//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
             _context = context;//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
         }
@@ -52,62 +53,60 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
                 var claims = new List<Claim>//claims: Değişkenin adıdır. "new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür.
                 {//Bu durumda, claims değişkeninin türü List<Claim> olacaktır. Derleyici, sağ taraftaki ifadeye bakarak türü otomatik olarak belirler.
 
-                    new Claim(ClaimTypes.Name, user.Username ?? string.Empty),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
+                    new Claim(ClaimTypes.Name, user.Username ?? string.Empty),//"," bir operatördür ve yan tarafta "," liste öğelerini ayırmak için kullanılmıştır. "??" Null kontrolü yapan bir operatördür. Eğer user.Username null ise, "string.Empty" değeri kullanılır. "string.Empty" Boş bir string değeridir
+                    new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())//.ToString()  bir değeri string formatına dönüştürmek için kullanılan bir metottur.
                 };
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties();
 
-                await HttpContext.SignInAsync(
-                    CookieAuthenticationDefaults.AuthenticationScheme,
-                    new ClaimsPrincipal(claimsIdentity),
-                    authProperties);
+                await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme,new ClaimsPrincipal(claimsIdentity),authProperties);
+                //await biir asenkron işlemi beklemek için kullanılan bir keyword'dür. "await" keyword'ü  yalnızca async olarak işaretlenmiş bir metot içinde kullanılabilir.
+                return RedirectToAction("Index");//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.RedirectToAction() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.
+            }//"Index" RedirectToAction metoduna parametre olarak verilen bir string'dir.
 
-                return RedirectToAction("Index");
-            }
-
-            ViewBag.Error = "Kullanıcı adı veya şifre hatalı";
+            ViewBag.Error = "Kullanıcı adı veya şifre hatalı";//ViewBag nesnesine Error özelliğinin eklenmesini ve bu özelliğe "Kullanıcı adı veya şifre hatalı" değerinin atanmasını ifade eder
             return View();//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.View() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.
         }
 
-        public async Task<IActionResult> Logout()
+        public async Task<IActionResult> Logout()//async bu metotun asenkron çalışacağını belirtir.Asenkron işlemler, uygulamanın diğer işlemleri engellemeden uzun süren işlemleri gerçekleştirmesine olanak tanır.
+        //Logout bir methot adıdır bu methodun aldığı parametrelerde string keyword'ü metin değeri tutan bir veri türüdür 
         {
-            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-            return RedirectToAction("Login");
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);//await biir asenkron işlemi beklemek için kullanılan bir keyword'dür. "await" keyword'ü  yalnızca async olarak işaretlenmiş bir metot içinde kullanılabilir.
+            return RedirectToAction("Login");//Return keyword'ü bir metottan bir değer döndürmek için kullanılır.RedirectToAction() bir metot ismidir ve () operatörü, bir metodu çağırmak için kullanılır.
+        //"Login" RedirectToAction metoduna parametre olarak verilen bir string'dir.
         }
 
         [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
-        public IActionResult AddTodo([FromBody] Todo todo) 
+        public IActionResult AddTodo([FromBody] Todo todo)//"[FromBody]" bir attribute'dur. "Todo" bir sınıf ismidir."todo" ise metodun aldığı parametrenin adıdır.
         {
-            try
+            try//"try" hata yönetimi için kullanıla nbir keyword'tür. "try" bloğu içinde hata oluşabilecek kodlar yazılır. Eğer bir hata olulursa catch bloğu çalıştırılır.
             {
-                if (!string.IsNullOrEmpty(todo.Title))
+                if (!string.IsNullOrEmpty(todo.Title))//"string.IsNullOrEmpty" bir string'in null veya boş olup olmadığını kontrol eden bir metottur.
                 {
-                    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                    
-                    var newTodo = new Todo 
+                    var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//" var" değişkenin türünü otomatik olarak belirler. "int.Parse" string bir değeri tam sayıya (int) dönüştürür.
+                    var newTodo = new Todo//"new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür.
                     {
-                        Title = todo.Title,
-                        Description = todo.Description,
-                        IsCompleted = false,
-                        CreatedDate = DateTime.Now,
-                        UserId = userId
+                        Title = todo.Title,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+                        Description = todo.Description,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+                        IsCompleted = false,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+                        CreatedDate = DateTime.Now,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+                        UserId = userId//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
                     };
 
                     _context.Todos.Add(newTodo);
                     _context.SaveChanges();
                     
-                    return Json(new { success = true, todo = newTodo });
-                }
-                return Json(new { success = false, message = "Başlık boş olamaz" });
-            }
-            catch (Exception ex)
-            {
+                    return Json(new { success = true, todo = newTodo });//"Json" JSON formatında bir yanıt döndürmek için kullanılan bir metottur.
+                }//"success = true" işlemin başarılı olduğunu belirtir.
+                return Json(new { success = false, message = "Başlık boş olamaz" });//"success = false" işlemin başarısız olduğunu belirtir.
+            }   //message = "Başlık boş olamaz" message değerini "Başlık boş olamaz" olarak değiştirir.
+            catch (Exception ex)//"catch" "try" bloğunda bir hata oluşursa çalıştırılır. "Exeption" oluşan hatayı temsil eden bir sınıftır.
+            {//"ex" hata nesnesinin adıdır.
                 _logger.LogError(ex, "Görev eklenirken hata oluştu"); 
-                return Json(new { success = false, message = "Bir hata oluştu" });
-            }
+                return Json(new { success = false, message = "Bir hata oluştu" });//"success = false" işlemin başarısız olduğunu belirtir.
+            }//message = "Başlık boş olamaz" message değerini "Başlık boş olamaz" olarak değiştirir.
         }
 
         [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
