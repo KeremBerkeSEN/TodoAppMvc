@@ -87,16 +87,18 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
                 {
                     var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//" var" değişkenin türünü otomatik olarak belirler. "int.Parse" string bir değeri tam sayıya (int) dönüştürür.
                     var newTodo = new Todo//"new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür.
-                    {
+                    {//"{}" Yeni bir nesne oluştururken, bu nesnenin özelliklerini başlatmak için kullanılır. "," ise Nesne başlatıcı içinde birden fazla özelliği ayırmak için kullanılır (son özellik hariç).
+
                         Title = todo.Title,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
                         Description = todo.Description,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
                         IsCompleted = false,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
-                        CreatedDate = DateTime.Now,//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
+                        CreatedDate = DateTime.Now,//"=" operatörü burada sağdaki değeri soldaki değişkene atar. "DateTime" C# dilinde tarih ve saat bilgilerini temsil eden bir sınıftır.
+                        //"Now" DateTime sınıfının bir özelliğidir. Bu özellik, şu anki tarih ve saati döndürür.
                         UserId = userId//"=" operatörü burada sağdaki değeri soldaki değişkene atar.
                     };
 
-                    _context.Todos.Add(newTodo);
-                    _context.SaveChanges();
+                    _context.Todos.Add(newTodo);//Add() veritabanına yeni bir kayıt eklemek için kullanılan bir metottur. "newTodo" veritabanına eklenmek istenen nesnedir. 
+                    _context.SaveChanges();//SaveChanges() veritabanındaki değişiklikleri kayıt etmek için kullanılan bir metottur.
                     
                     return Json(new { success = true, todo = newTodo });//"Json" JSON formatında bir yanıt döndürmek için kullanılan bir metottur.
                 }//"success = true" işlemin başarılı olduğunu belirtir.
@@ -104,79 +106,90 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             }   //message = "Başlık boş olamaz" message değerini "Başlık boş olamaz" olarak değiştirir.
             catch (Exception ex)//"catch" "try" bloğunda bir hata oluşursa çalıştırılır. "Exeption" oluşan hatayı temsil eden bir sınıftır.
             {//"ex" hata nesnesinin adıdır.
-                _logger.LogError(ex, "Görev eklenirken hata oluştu"); 
+                _logger.LogError(ex, "Görev eklenirken hata oluştu");//"_logger" bir nesnedir ve LogError metodu, hata mesajını kaydetmek için kullanılır. "ex" catch bloğunda yakalanan hata nesnesidir.
+                //"Görev eklenirken hata oluştu" loglama sırasında kullanılacak açıklayıcı bir mesajdır. Bu mesaj, log kaydında hata ile ilgili bağlam sağlamak için kullanılır
                 return Json(new { success = false, message = "Bir hata oluştu" });//"success = false" işlemin başarısız olduğunu belirtir.
             }//message = "Başlık boş olamaz" message değerini "Başlık boş olamaz" olarak değiştirir.
         }
 
         [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
-        public IActionResult ToggleTodo(int id)
+        public IActionResult ToggleTodo(int id)//IActionResult bir interface(arayüz)'dir."int id" ToggleTodo() metotunun parametresidir ve id değişkeninin veri türünün belirlenmesini ifade eder.
         {
-            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-            var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);
+            var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//Burada "var" keyword'ü değişkeni bildirmek ve derleyicinin değişkenin türünü otomatik belirlemesi için kullanılır.
+            //userId değişkeni, User nesnesi içerisinden FindFirst fonksiyonu ile ClaimTypes.NameIdentifier değerini bulur ve bu değeri int türüne dönüştürür. Eğer bu değer null ise, "0" olarak varsayılır.
+            var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);//"_context.Todos" veritabanındaki Todos tablosuna erişim sağlar. "FirstOrDefault" metodu, todos koleksiyonunda belirtilen koşula uyan ilk öğeyi bulur.
+                //Todos koleksiyonundaki her bir öğe için şu koşullar kontrol edilir. "t.Id" özelliği, "id" parametresine eşit mi? "t.UserId" özelliği, "userId" değişkenine eşit mi? Eğer belirtilen koşullara uyan bir öğe varsa, bu öğe "todo" değişkenine atanır. Eğer böyle bir öğe yoksa, "todo" değişkeni null olur.
             
-            if (todo != null)
-            {
-                todo.IsCompleted = !todo.IsCompleted;
-                _context.SaveChanges();
-                return Json(new { success = true });
-            }
-            return Json(new { success = false, message = "Görev bulunamadı" });
+            if (todo != null)//if bir koşul ifadesidir,() içerisinde koşullar belirtilir, belirtilen koşul doğruysa {} içinde tanımlanan kod bloğu çalıştırılır.
+            {//"!=" mantıksal eşit değil operatörüdür. "todo" değişkeni "null" değerinden farklı bir değer ise {} içindeki kod bloğu çalıştırılır.
+                todo.IsCompleted = !todo.IsCompleted;//"!" operatörü mantıksal "değil" operatörüdür. Burada todo.IsCompleted özelliğinin değerini tersine çevirir.
+                _context.SaveChanges();//SaveChanges() veritabanındaki değişiklikleri kayıt etmek için kullanılan bir metottur.
+                return Json(new { success = true });//"Json" JSON formatında bir yanıt döndürmek için kullanılan bir metottur.
+            }//"success = true" işlemin başarılı olduğunu belirtir.
+            return Json(new { success = false, message = "Görev bulunamadı" });//"success = false" işlemin başarısız olduğunu belirtir. message = "Görev bulunamadı" ,message değerini "Görev bulunamadı" olarak değiştirir.
         }
 
         [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
-        public IActionResult DeleteTodo([FromBody] int id) 
+        public IActionResult DeleteTodo([FromBody] int id) //IActionResult bir interface(arayüz)'dir."int id" DeleteTodo() metotunun parametresidir ve id değişkeninin veri türünün belirlenmesini ifade eder.
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//Burada "var" keyword'ü değişkeni bildirmek ve derleyicinin değişkenin türünü otomatik belirlemesi için kullanılır.
+                //userId değişkeni, User nesnesi içerisinden FindFirst fonksiyonu ile ClaimTypes.NameIdentifier değerini bulur ve bu değeri int türüne dönüştürür. Eğer bu değer null ise, "0" olarak varsayılır.
+                var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);//"_context.Todos" veritabanındaki Todos tablosuna erişim sağlar. "FirstOrDefault" metodu, todos koleksiyonunda belirtilen koşula uyan ilk öğeyi bulur.
+                //Todos koleksiyonundaki her bir öğe için şu koşullar kontrol edilir. "t.Id" özelliği, "id" parametresine eşit mi? "t.UserId" özelliği, "userId" değişkenine eşit mi? Eğer belirtilen koşullara uyan bir öğe varsa, bu öğe "todo" değişkenine atanır. Eğer böyle bir öğe yoksa, "todo" değişkeni null olur.
                 
-                if (todo != null)
+                if (todo != null)//if bir koşul ifadesidir,() içerisinde koşullar belirtilir, belirtilen koşul doğruysa {} içinde tanımlanan kod bloğu çalıştırılır.
+                //"!=" mantıksal eşit değil operatörüdür. "todo" değişkeni "null" değerinden farklı bir değer ise {} içindeki kod bloğu çalıştırılır.
                 {
-                    _context.Todos.Remove(todo);
-                    _context.SaveChanges();
-                    return Json(new { success = true });
-                }
-                return Json(new { success = false, message = "Görev bulunamadı" });
+                    _context.Todos.Remove(todo);//Remove() veritabanına yeni bir kayıt eklemek için kullanılan bir metottur. "todo" veritabanından silinmek istenen nesnedir. 
+                    _context.SaveChanges();//SaveChanges() veritabanındaki değişiklikleri kayıt etmek için kullanılan bir metottur.
+                    return Json(new { success = true });//"Json" JSON formatında bir yanıt döndürmek için kullanılan bir metottur.
+                }//"success = true" işlemin başarılı olduğunu belirtir.
+                return Json(new { success = false, message = "Görev bulunamadı" });//"success = false" işlemin başarısız olduğunu belirtir. message = "Görev bulunamadı" ,message değerini "Görev bulunamadı" olarak değiştirir.
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Görev silinirken hata oluştu");
-                return Json(new { success = false, message = "Bir hata oluştu" });
+            catch (Exception ex)//"catch" "try" bloğunda bir hata oluşursa çalıştırılır. "Exeption" oluşan hatayı temsil eden bir sınıftır.
+            {//"ex" hata nesnesinin adıdır.
+                _logger.LogError(ex, "Görev silinirken hata oluştu");//"_logger" bir nesnedir ve LogError metodu, hata mesajını kaydetmek için kullanılır. "ex" catch bloğunda yakalanan hata nesnesidir.
+                //"Görev eklenirken hata oluştu" loglama sırasında kullanılacak açıklayıcı bir mesajdır. Bu mesaj, log kaydında hata ile ilgili bağlam sağlamak için kullanılır
+                return Json(new { success = false, message = "Bir hata oluştu" });//"success = false" işlemin başarısız olduğunu belirtir. message = "Bir hata oluştu" ,message değerini "Bir hata oluştu" olarak değiştirir.
             }
         }
 
         [HttpPost]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
         [Authorize]//[]  Bir attribute'u tanımlamak için kullanılır. Attribute'lar bir sınıf, metot veya başka bir öğe hakkında ek bilgi sağlar.
-        public IActionResult CompleteTodo([FromBody] int id) 
+        public IActionResult CompleteTodo([FromBody] int id) //IActionResult bir interface(arayüz)'dir."int id" CompleteTodo() metotunun parametresidir ve id değişkeninin veri türünün belirlenmesini ifade eder.
         {
             try
             {
-                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
-                var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);
-                
-                if (todo != null)
+                var userId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");//Burada "var" keyword'ü değişkeni bildirmek ve derleyicinin değişkenin türünü otomatik belirlemesi için kullanılır.
+                //userId değişkeni, User nesnesi içerisinden FindFirst fonksiyonu ile ClaimTypes.NameIdentifier değerini bulur ve bu değeri int türüne dönüştürür. Eğer bu değer null ise, "0" olarak varsayılır.
+                var todo = _context.Todos.FirstOrDefault(t => t.Id == id && t.UserId == userId);//"_context.Todos" veritabanındaki Todos tablosuna erişim sağlar. "FirstOrDefault" metodu, todos koleksiyonunda belirtilen koşula uyan ilk öğeyi bulur.
+                //Todos koleksiyonundaki her bir öğe için şu koşullar kontrol edilir. "t.Id" özelliği, "id" parametresine eşit mi? "t.UserId" özelliği, "userId" değişkenine eşit mi? Eğer belirtilen koşullara uyan bir öğe varsa, bu öğe "todo" değişkenine atanır. Eğer böyle bir öğe yoksa, "todo" değişkeni null olur.
+                if (todo != null)//if bir koşul ifadesidir,() içerisinde koşullar belirtilir, belirtilen koşul doğruysa {} içinde tanımlanan kod bloğu çalıştırılır.
+            //"!=" mantıksal eşit değil operatörüdür. "todo" değişkeni "null" değerinden farklı bir değer ise {} içindeki kod bloğu çalıştırılır
                 {
-                    _context.Todos.Remove(todo);
-                    _context.SaveChanges();
-                    return Json(new { success = true });
-                }
-                return Json(new { success = false, message = "Görev bulunamadı" });
+                    _context.Todos.Remove(todo);//Remove() veritabanına yeni bir kayıt eklemek için kullanılan bir metottur. "todo" veritabanından silinmek istenen nesnedir. 
+                    _context.SaveChanges();//SaveChanges() veritabanındaki değişiklikleri kayıt etmek için kullanılan bir metottur.
+                    return Json(new { success = true });//"Json" JSON formatında bir yanıt döndürmek için kullanılan bir metottur.
+                }//"success = true" işlemin başarılı olduğunu belirtir.
+                return Json(new { success = false, message = "Görev bulunamadı" });//"success = false" işlemin başarısız olduğunu belirtir. message = "Görev bulunamadı" ,message değerini "Görev bulunamadı" olarak değiştirir.
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Görev tamamlanırken hata oluştu");
-                return Json(new { success = false, message = "Bir hata oluştu" });
+            catch (Exception ex)//"catch" "try" bloğunda bir hata oluşursa çalıştırılır. "Exeption" oluşan hatayı temsil eden bir sınıftır.
+            {//"ex" hata nesnesinin adıdır.
+                _logger.LogError(ex, "Görev tamamlanırken hata oluştu");//"Görev eklenirken hata oluştu" loglama sırasında kullanılacak açıklayıcı bir mesajdır. Bu mesaj, log kaydında hata ile ilgili bağlam sağlamak için kullanılır
+                return Json(new { success = false, message = "Bir hata oluştu" });//"success = false" işlemin başarısız olduğunu belirtir. message = "Bir hata oluştu" ,message değerini "Bir hata oluştu" olarak değiştirir.
             }
         }
 
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
+        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]//[ResponseCache] bir attribute'dur ve ASP.NET Core'da yanıtların önbelleğe alınmasını kontrol etmek için kullanılır.Duration = 0: Yanıtın önbellekte ne kadar süreyle saklanacağını belirtir. 0 değeri, yanıtın önbelleğe alınmayacağını ifade eder.
+        //Location = ResponseCacheLocation.None: Yanıtın hiçbir yerde (istemci veya proxy) önbelleğe alınmayacağını belirtir. NoStore = true: Yanıtın hiçbir şekilde önbelleğe alınmamasını zorunlu kılar.
+        public IActionResult Error()//IActionResult bir interface(arayüz)'dir. "Error()" bir metot adıdır ve bu metot hata durumunda çağrılır.
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
-    }
+            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });// "return" bir metottan bir değer döndürmek için kullanılan bir keyword'dür.
+        }// "View" bir Razor View döndürmek için kullanılan bir metottur. "new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür."ErrorViewModel" hata bilgilerini taşımak için kullanılan bir sınıftır.
+    }//"?." Null kontrolü yapan bir operatördür. Eğer Activity.Current null ise, Id özelliğine erişmeye çalışmaz.
+//"Id" mevcut işlemin benzersiz kimliğini temsil eder."??"  null coalescing operatörüdür. Eğer Activity.Current?.Id null ise, HttpContext.TraceIdentifier değeri kullanılır.
 }
