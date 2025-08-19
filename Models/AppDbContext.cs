@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace TodoMvcApp.Models
 {
-    public class AppDbContext : DbContext//db getter setter işlemleri
+    public class AppDbContext : DbContext
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {

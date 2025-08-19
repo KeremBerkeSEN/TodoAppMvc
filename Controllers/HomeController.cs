@@ -51,7 +51,7 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
             if (user != null)//if bir koşul ifadesidir,() içerisinde koşullar belirtilir, belirtilen koşul doğruysa {} içinde tanımlanan kod bloğu çalıştırılır.
             {//burada "!=" bir karşılaştırma operatörüdür. İki değerin eşit olmadığını kontrol eder. "null" bir değerdir ve bir değişkenin herhangi bir nesneye işaret etmediğini belirtir. Burada user değişkeninin değeri null değilse {} içindeki kod satırları çalıştıralacaktır
                 var claims = new List<Claim>//claims: Değişkenin adıdır. "new" yeni bir nesne oluşturmak için kullanılan bir keyword'dür.
-                {//Bu durumda, claims değişkeninin türü List<Claim> olacaktır. Derleyici, sağ taraftaki ifadeye bakarak türü otomatik olarak belirler.
+                {//"List<Claim>" C# dilinde bir generic koleksiyon türüdür. "Claim" türündeki nesneleri saklayacak bir listeyi temsil eder.
 
                     new Claim(ClaimTypes.Name, user.Username ?? string.Empty),//"," bir operatördür ve yan tarafta "," liste öğelerini ayırmak için kullanılmıştır. "??" Null kontrolü yapan bir operatördür. Eğer user.Username null ise, "string.Empty" değeri kullanılır. "string.Empty" Boş bir string değeridir
                     new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())//.ToString()  bir değeri string formatına dönüştürmek için kullanılan bir metottur.
