@@ -1,6 +1,9 @@
-using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;//"using" kalıbı bir keyword'tür aşağıda kullanacağımız bazı kelimelerin hangi kütüphanelerden geleceğini belirtmek 
+// için kütüphane adının başına ekleriz "." ise bir operatördür ve amacı bir nesnenin özelliklerine, metodlarına veya alt üyelerine erişmek için kullanılır.
+//"." operatörü yukarıda using keywordü ile kullanılacak metotların vs Microsoft namespace'inin EntityFrameworkCore alt namespace'inde olduğunu belirtir.
 
-namespace TodoMvcApp.Models
+namespace TodoMvcApp.Models//namespace bir keyword'tür namespace burada ifade edilecek tanımların başka yerlerdeki tanımlarla karıştırılmaması ve buraya özgü olduğunu belirtmek için kullanılır. 
+//
 {
     public class AppDbContext : DbContext
     {
