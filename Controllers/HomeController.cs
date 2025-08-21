@@ -12,7 +12,7 @@ namespace TodoMvcApp.Controllers   // burada namespace bir keyword'tür namespac
 {
     public class HomeController : Controller// public,private ve protected gibi keyword'ler önüne yazıldığı sınıf vb. seylerin erişilebilme türlerini ifade eder
     //class ise bir nesneyi düzenlemek ve özel bir şekilde inşaa etmek için parçalarına (class'larına) bölüp bu parçalardan tekrar bir bütün elde etmemizi sağlar
-    //HomeController : Controller ise bu sınıfın diğer sını flarlarla karışmaması için sadece HomeController'daki Controller sınıfının olduğunu belirtir
+    //HomeController : Controller ise bu sınıfın diğer sınıflarla karışmaması için sadece HomeController'daki Controller sınıfının olduğunu belirtir
     {
         private readonly ILogger<HomeController> _logger;//Burada <> operatörleri, bir sınıfın belirli bir türle çalışmasını sağlar. 
         private readonly AppDbContext _context;//readonly keyword'ü bir alanın (field) yalnızca tanımlandığı sırada veya constructor içinde atanabileceğini belirtir
